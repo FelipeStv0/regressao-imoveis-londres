@@ -3,3 +3,4 @@ pandas>=2.2,<4
 matplotlib>=3.8,<4
 scikit-learn>=1.5,<2
 kagglehub>=1.0.2,<2
+tabulate>=0.9,<1
