@@ -247,7 +247,7 @@ def write_markdown_report(path: Path, validation: pd.DataFrame, test: pd.DataFra
         "",
         "## Protocolo",
         "",
-        f"- Fonte e hashes SHA-256 dos dois CSVs: `configuracao.json`.",
+        "- Fonte e hashes SHA-256 dos dois CSVs: `configuracao.json`.",
         f"- Treino: até {TRAIN_LAST_YEAR}; validação: {TRAIN_LAST_YEAR + 1}–{VAL_LAST_YEAR}; teste: {VAL_LAST_YEAR + 1}–{TEST_LAST_YEAR}.",
         "- A escolha de hiperparâmetros e do modelo foi feita **somente na validação**.",
         "- Após selecionar, os modelos foram reajustados em treino+validação para teste.",
@@ -282,7 +282,7 @@ def write_markdown_report(path: Path, validation: pd.DataFrame, test: pd.DataFra
         "",
         "## Reprodutibilidade",
         "",
-        f"- Parâmetros de execução e hashes: `configuracao.json`.",
+        "- Parâmetros de execução e hashes: `configuracao.json`.",
         f"- Linhas: {metadata['n_total']}; períodos: {metadata['n_treino']}/{metadata['n_validacao']}/{metadata['n_teste']}.",
         "- Resultados detalhados nos CSVs e figuras no mesmo diretório.",
     ]
