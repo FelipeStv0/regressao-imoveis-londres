@@ -14,7 +14,7 @@ O pipeline usa imputação pela mediana e padronização ajustadas apenas sobre 
 
 ## Comparação resumida de resultados
 
-**Referência histórica:** valores já registrados na execução original do notebook, não substituídos por números inventados. Os números abaixo **não são resultado de uma nova execução do CI**; após a execução automatizada, os CSVs gerados nos artefatos constituem a evidência atual.
+**Resultados reproduzidos em ambiente limpo em 08/11/2026:** o [GitHub Actions (execução #42500093460)](https://github.com/FelipeStv0/regressao-imoveis-londres/actions/runs/42500093460) instalou as dependências em Python 3.11, obteve os CSVs pelo Kaggle, executou todas as células do notebook e validou os resultados. As métricas de teste coincidiram com as saídas históricas do estudo. Consulte o [artefato da execução](https://github.com/FelipeStv0/regressao-imoveis-londres/actions/runs/42500093460/artifacts/13625071431) para obter o notebook executado e os CSVs.
 
 | Modelo | MAE no teste (£) ↓ | RMSE no teste (£) ↓ | R² no teste ↑ |
 | --- | ---: | ---: | ---: |
@@ -70,7 +70,7 @@ O workflow [Reprodutibilidade do notebook](.github/workflows/reproducibility.yml
 3. Execução integral do notebook via `nbconvert` e exportação de `artifacts/metricas_validacao.csv` e `artifacts/metricas_teste.csv`.
 4. Verificação de estrutura e sanidade das métricas e publicação do **notebook executado e CSVs** como artefatos do job (retenção: 14 dias).
 
-Consulte a aba **Actions** para verificar se houve sucesso ou falha. **Testes offline aprovados não demonstram, isoladamente, que a integração de rede e o notebook completo funcionaram.** Uma execução automatizada também não comprova adequação estatística para produção. Se a fonte estiver indisponível, o job deverá falhar de forma visível, sem simular métricas reais.
+Consulte a aba **Actions** para verificar se houve sucesso ou falha. **Verificação:** na [execução #42500093460](https://github.com/FelipeStv0/regressao-imoveis-londres/actions/runs/42500093460), os 6 testes offline passaram, os dois arquivos foram obtidos com sucesso (675.287 e 79.913 bytes), e a execução integral produziu os quatro resultados da tabela. **Isso demonstra funcionamento técnico naquela execução, não confiabilidade estatística para produção.** Se a fonte estiver indisponível, o job deverá falhar de forma visível, sem simular métricas reais.
 
 ## Arquivos principais
 
