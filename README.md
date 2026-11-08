@@ -24,7 +24,7 @@ Projeto de **portfólio em Ciência de Dados e Machine Learning**: regressão so
 
 **2. Benchmark adicional para portfólio:** [scripts/run_benchmark.py](scripts/run_benchmark.py). Introduz divisão temporal (treino até 2013, validação de 2014 a 2016 e teste de 2017 a 2019), seleção de hiperparâmetros na validação, avaliação de cinco famílias de modelos no teste, `GroupKFold` por distrito (somente período de desenvolvimento), importância por permutação na validação e intervalos descritivos por bootstrap de distritos.
 
-Veja [metodologia detalhada e ameaças à validade](docs/metodologia.md).
+Veja [metodologia detalhada e ameaças à validade](docs/metodologia.md), [análise dos resultados](docs/resultados.md) e o [Model Card](docs/model_card.md).
 
 ```mermaid
 flowchart TD
@@ -53,11 +53,23 @@ Reproduzidos em [CI de 08/11/2026](https://github.com/FelipeStv0/regressao-imove
 
 R² baixo e erros elevados indicam limitações preditivas importantes. O polinômio com menor RMSE nesse teste **não é uma solução de precificação**.
 
-## Novo benchmark temporal
+## Novo benchmark temporal — resultados reais
 
-O benchmark produz **duas tabelas separadas** (`validacao_temporal.csv` e `teste_temporal.csv`), análises por distrito/ano, `geografico_cv_detalhado.csv`, `configuracao.json`, figuras em PNG e um relatório Markdown com valores efetivamente calculados. O modelo de menor RMSE no **teste** não é necessariamente o campeão: o campeão é escolhido **antes, na validação**.
+**Fonte:** [execução GitHub Actions #42533710022](https://github.com/FelipeStv0/regressao-imoveis-londres/actions/runs/42533710022) em 08/11/2026, com **693 observações no total, 99 no teste temporal e 18 testes automatizados aprovados**. A escolha dos modelos e hiperparâmetros usou apenas 2014–2016; o teste contém 2017–2019.
 
-Os valores da nova etapa devem ser consultados nos artefatos da execução CI ou gerados localmente pelos comandos abaixo; não são substituídos por métricas simuladas.
+| Modelo | MAE no teste (£) ↓ | RMSE no teste (£) ↓ | R² no teste ↑ |
+| --- | ---: | ---: | ---: |
+| Random Forest (selecionado na validação) | **122.305** | **207.682** | **−0,014** |
+| Linear simples | 150.304 | 232.487 | −0,270 |
+| Linear múltipla | 156.102 | 237.566 | −0,326 |
+| Ridge (α = 0,1) | 156.102 | 237.569 | −0,326 |
+| Baseline (média) | 220.321 | 301.299 | −1,133 |
+
+![RMSE dos modelos no teste temporal](docs/figures/rmse_teste_temporal.svg)
+
+**Interpretação:** Random Forest reduziu o RMSE em aproximadamente **31,1% em comparação com o baseline** neste protocolo. No entanto, **R² = −0,014** significa que, em relação à média do próprio conjunto de teste, o poder explicativo continua inadequado. Não é correto descrevê-lo como modelo confiável para estimar preços de imóveis.
+
+O experimento ainda fornece `validacao_temporal.csv`, `teste_temporal.csv`, `geografico_cv_detalhado.csv`, `configuracao.json`, figuras PNG, erros por distrito/ano e relatório Markdown. O campeão é escolhido **antes do teste**, exclusivamente pelo RMSE na validação. Consulte [interpretação completa e comparação geográfica](docs/resultados.md) e as [limitações da metodologia](docs/metodologia.md).
 
 ## Reproduzir (Python 3.11)
 
@@ -99,7 +111,10 @@ O workflow [Reprodutibilidade e benchmark de ML](.github/workflows/reproducibili
 ├── Regressao_Londres_Codigo.ipynb    # Estudo original preservado
 ├── Relatorio_Regressao_Londres.pdf  # Relatório acadêmico histórico
 ├── docs/
-│   └── metodologia.md               # Protocolo e ameaças à validade
+│   ├── metodologia.md               # Protocolo e ameaças à validade
+│   ├── resultados.md                # Resultados reproduzidos e interpretação
+│   ├── model_card.md                # Limitações, riscos e uso permitido
+│   └── figures/rmse_teste_temporal.svg
 ├── scripts/
 │   ├── prepare_data.py              # CSV local ou download opt-in
 │   ├── london_benchmark.py          # Dataset, modelos e métricas

@@ -31,5 +31,9 @@ Aprendizado, comparação metodológica de modelos, exploração de diagnóstico
 ## Acompanhamento e reprodução
 Execute `python scripts/run_benchmark.py --dir data --output artifacts/benchmark` e consulte `artifacts/benchmark/relatorio_benchmark.md`, hashes SHA-256 e versões em `configuracao.json`. Resultados podem mudar se a fonte ou dependências mudarem; não substitua uma medição por outra sem registrar origem e versão.
 
+## Resultados observados na avaliação temporal de 08/11/2026
+
+Na execução [#42533710022](https://github.com/FelipeStv0/regressao-imoveis-londres/actions/runs/42533710022), o Random Forest foi escolhido na validação (RMSE £225.919), e no teste posterior obteve MAE £122.305, RMSE £207.682, R² = −0,014; o baseline apresentou RMSE £301.299 e R² = −1,133. Apesar da redução relativa de RMSE, **R² negativo impede alegar capacidade preditiva satisfatória**. Consulte [análise detalhada](resultados.md).
+
 ## Situação
 **Protótipo didático; sem validação para implantação ou decisões comerciais.**

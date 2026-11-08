@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="456" viewBox="0 0 800 456" role="img" aria-labelledby="title desc">
+<title id="title">RMSE no teste temporal (2017 a 2019) por modelo</title>
+<desc id="desc">Random Forest: 207682; linear simples: 232487; linear múltipla: 237566; Ridge: 237569; baseline: 301299 libras. Valores menores são melhores; as barras começam no zero.</desc>
+<style>
+text {font-family: system-ui, -apple-system, "Segoe UI", sans-serif;}
+.title {font-size:21px;font-weight:700;fill:#0F172A;}
+.subtitle {font-size:13px;fill:#475569;}
+.name {font-size:16px;fill:#0F172A;font-weight:500;}
+.value {font-size:15px;fill:#0F172A;font-weight:600;}
+.note {font-size:13px;fill:#475569;}
+</style>
+<rect width="800" height="456" fill="#FFFFFF"/>
+<text x="24" y="39" class="title">RMSE por modelo — teste temporal</text>
+<text x="24" y="66" class="subtitle">2017–2019 · 99 observações · libras esterlinas · menor é melhor</text>
+<line x1="213" y1="102" x2="213" y2="390" stroke="#CBD5E1" stroke-width="1.5"/>
+<text x="24" y="136" class="name">Random Forest</text><rect x="213" y="112" width="261" height="32" rx="6" fill="#0E7490"/><text x="486" y="135" class="value">£ 207.682</text>
+<text x="24" y="191" class="name">Linear simples</text><rect x="213" y="167" width="292" height="32" rx="6" fill="#64748B"/><text x="517" y="190" class="value">£ 232.487</text>
+<text x="24" y="246" class="name">Linear múltipla</text><rect x="213" y="222" width="299" height="32" rx="6" fill="#64748B"/><text x="524" y="245" class="value">£ 237.566</text>
+<text x="24" y="301" class="name">Ridge</text><rect x="213" y="277" width="299" height="32" rx="6" fill="#64748B"/><text x="524" y="300" class="value">£ 237.569</text>
+<text x="24" y="356" class="name">Baseline</text><rect x="213" y="332" width="379" height="32" rx="6" fill="#64748B"/><text x="604" y="355" class="value">£ 301.299</text>
+<text x="24" y="426" class="note">Random Forest selecionado na validação; R² no teste = −0,014 (limitação importante).</text>
+</svg>

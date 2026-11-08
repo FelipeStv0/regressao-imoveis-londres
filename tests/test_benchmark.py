@@ -2,7 +2,6 @@
 import numpy as np
 import pandas as pd
 import pytest
-from pathlib import Path
 
 from scripts.london_benchmark import (
     TARGET, bootstrap_by_district, candidates, choose_from_validation,

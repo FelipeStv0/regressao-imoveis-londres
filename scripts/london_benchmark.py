@@ -9,11 +9,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 import hashlib
-import json
 
 import numpy as np
 import pandas as pd
-from sklearn.base import clone
 from sklearn.dummy import DummyRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.impute import SimpleImputer
@@ -144,7 +142,7 @@ def choose_from_validation(train: pd.DataFrame, val: pd.DataFrame):
         for spec in variants:
             model, predictions = _predict(spec, train, val)
             scored.append((metric_values(val[TARGET], predictions)["RMSE"], spec, model, predictions))
-        best_rmse, spec, fitted, predictions = min(scored, key=lambda item: item[0])
+        _best_rmse, spec, _fitted, predictions = min(scored, key=lambda item: item[0])
         chosen[family] = spec
         records.append({"modelo": family, "configuracao": spec.description(),
                         **metric_values(val[TARGET], predictions)})
