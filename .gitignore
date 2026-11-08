@@ -1,0 +1,14 @@
+# Dados obtidos na origem, não redistribuídos
+/data/
+/housing_in_london_monthly_variables.csv
+/housing_in_london_yearly_variables.csv
+# Saídas reproduzíveis
+/artifacts/
+/.ipynb_checkpoints/
+/__pycache__/
+**/__pycache__/
+.pytest_cache/
+.venv/
+.env
+.kaggle/
+kaggle.json

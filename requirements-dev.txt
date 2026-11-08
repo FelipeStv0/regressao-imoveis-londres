@@ -1,0 +1,4 @@
+-r requirements.txt
+pytest>=8,<10
+nbconvert>=7.16,<8
+ipykernel>=6,<8

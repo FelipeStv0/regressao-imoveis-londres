@@ -1,0 +1,51 @@
+name: Reproducibilidade do notebook
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  notebook:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      LONDON_DATA_DIR: data
+    steps:
+      - name: Obter código
+        uses: actions/checkout@v4
+      - name: Preparar Python limpo
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+      - name: Instalar dependências
+        run: python -m pip install -r requirements-dev.txt
+      - name: Testes offline
+        run: python -m pytest -q tests
+      - name: Obter dataset da fonte oficial
+        run: python scripts/prepare_data.py --download --dir data
+      - name: Executar notebook do início ao fim
+        run: |
+          mkdir -p artifacts
+          jupyter nbconvert --to notebook --execute \
+            --ExecutePreprocessor.timeout=600 \
+            --output executed.ipynb --output-dir artifacts \
+            Regressao_Londres_Codigo.ipynb
+      - name: Verificar métricas exportadas
+        run: python scripts/check_results.py artifacts/metricas_teste.csv
+      - name: Publicar saídas da execução
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: notebook-executado-e-metricas
+          path: artifacts/
+          if-no-files-found: warn
+          retention-days: 14
