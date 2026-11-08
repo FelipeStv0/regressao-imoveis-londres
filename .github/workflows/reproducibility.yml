@@ -15,7 +15,6 @@ jobs:
     timeout-minutes: 25
     env:
       LONDON_DATA_DIR: data
-      MPLBACKEND: Agg
     steps:
       - name: Obter código
         uses: actions/checkout@v4
