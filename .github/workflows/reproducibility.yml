@@ -1,4 +1,4 @@
-name: Reproducibilidade do notebook
+name: Reprodutibilidade e benchmark de ML
 
 on:
   push:
@@ -10,11 +10,14 @@ permissions:
   contents: read
 
 jobs:
-  notebook:
+  portfolio-ml:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     env:
       LONDON_DATA_DIR: data
+      PYTHONHASHSEED: '0'
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
     steps:
       - name: Obter código
         uses: actions/checkout@v4
@@ -28,24 +31,35 @@ jobs:
             requirements-dev.txt
       - name: Instalar dependências
         run: python -m pip install -r requirements-dev.txt
-      - name: Testes offline
+      - name: Compilação sintática
+        run: python -m compileall -q scripts tests
+      - name: Lint Python (código novo e testes)
+        run: python -m ruff check --select E4,E7,E9,F scripts/london_benchmark.py scripts/run_benchmark.py scripts/check_benchmark.py tests/test_benchmark.py
+      - name: Testes offline de integridade, vazamento e métricas
         run: python -m pytest -q tests
-      - name: Obter dataset da fonte oficial
+      - name: Obter dataset pela API oficial
         run: python scripts/prepare_data.py --download --dir data
-      - name: Executar notebook do início ao fim
+      - name: Registrar versões de dependências
         run: |
-          mkdir -p artifacts
+          mkdir -p artifacts/benchmark
+          python -m pip freeze > artifacts/benchmark/dependencias_instaladas.txt
+      - name: Executar notebook acadêmico do início ao fim
+        run: |
           jupyter nbconvert --to notebook --execute \
             --ExecutePreprocessor.timeout=600 \
             --output executed.ipynb --output-dir artifacts \
             Regressao_Londres_Codigo.ipynb
-      - name: Verificar métricas exportadas
+      - name: Verificar métricas do notebook original
         run: python scripts/check_results.py artifacts/metricas_teste.csv
-      - name: Publicar saídas da execução
+      - name: Benchmark temporal e geográfico, interpretação e figuras
+        run: python scripts/run_benchmark.py --dir data --output artifacts/benchmark
+      - name: Verificar contrato dos artefatos do benchmark
+        run: python scripts/check_benchmark.py artifacts/benchmark
+      - name: Publicar notebook, dados derivados e resultados
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: notebook-executado-e-metricas
+          name: reproducibilidade-completa
           path: artifacts/
           if-no-files-found: warn
-          retention-days: 14
+          retention-days: 30
