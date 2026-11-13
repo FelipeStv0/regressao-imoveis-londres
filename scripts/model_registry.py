@@ -16,7 +16,7 @@ from sklearn.preprocessing import StandardScaler
 if __package__:
     from .data_protocol import SIMPLE, MULTIPLE, RANDOM_SEED
 else:
-    from data_protocol import TARGET, SIMPLE, MULTIPLE, RANDOM_SEED
+    from data_protocol import SIMPLE, MULTIPLE, RANDOM_SEED
 
 
 @dataclass(frozen=True)
