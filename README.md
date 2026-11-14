@@ -131,3 +131,11 @@ O workflow [Reprodutibilidade e benchmark de ML](.github/workflows/reproducibili
 ## Limites de interpretação
 
 A base contém aproximadamente 33 distritos e observações históricas por ano, não transações imobiliárias individuais. Falta informação de metragem, tipo, estado, localização precisa e disponibilidade real das variáveis no momento de previsão. Erros extremos e diferenças entre distritos exigem cautela; intervalos descritivos por bootstrap não são garantias de cobertura futura. Os resultados demonstram **processo de modelagem, avaliação crítica e engenharia reproduzível** — não estimativa imobiliária de uso comercial.
+
+
+## Manutenção e extensões
+
+Para novas variáveis, modelos e avaliações, consulte
+[docs/GUIA_MANUTENCAO.md](docs/GUIA_MANUTENCAO.md). A divisão de dados,
+o registro de modelos e a avaliação estão em módulos separados; os imports
+anteriores de `scripts.london_benchmark` continuam disponíveis.

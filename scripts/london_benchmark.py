@@ -3,115 +3,39 @@
 Separação temporal: treino <= 2013; validação 2014–2016; teste 2017–2019.
 Nenhuma decisão de seleção de modelo ou hiperparâmetro usa o teste.
 As variáveis anuais são contemporâneas aos preços; isto NÃO é previsão ex ante.
+
+INTEGRAÇÃO FUTURA: o protocolo vive em data_protocol.py e os modelos em
+model_registry.py. Este módulo reexporta suas APIs para manter notebooks,
+scripts e testes existentes compatíveis.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
 from pathlib import Path
 import hashlib
 
 import numpy as np
 import pandas as pd
-from sklearn.dummy import DummyRegressor
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.impute import SimpleImputer
-from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import GroupKFold
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
 
-TARGET = "average_price"
-SIMPLE = ("median_salary",)
-MULTIPLE = ("median_salary", "number_of_jobs", "recycling_pct")
-RANDOM_SEED = 42
-TRAIN_LAST_YEAR, VAL_LAST_YEAR, TEST_LAST_YEAR = 2013, 2016, 2019
+if __package__:
+    from .data_protocol import (TARGET, SIMPLE, MULTIPLE, RANDOM_SEED,
+        TRAIN_LAST_YEAR, VAL_LAST_YEAR, TEST_LAST_YEAR, load_housing_data, temporal_split)
+    from .model_registry import ModelSpec, candidates
+else:
+    from data_protocol import (TARGET, SIMPLE, MULTIPLE, RANDOM_SEED,
+        TRAIN_LAST_YEAR, VAL_LAST_YEAR, TEST_LAST_YEAR, load_housing_data, temporal_split)
+    from model_registry import ModelSpec, candidates
 
-
-def load_housing_data(data_dir: Path) -> pd.DataFrame:
-    """Junta as duas tabelas sem multiplicar linhas em merges ambíguos."""
-    monthly = pd.read_csv(data_dir / "housing_in_london_monthly_variables.csv", parse_dates=["date"])
-    yearly = pd.read_csv(data_dir / "housing_in_london_yearly_variables.csv", parse_dates=["date"])
-    for frame, columns in [
-        (monthly, {"area", "date", "borough_flag", TARGET}),
-        (yearly, {"area", "date", "borough_flag", *MULTIPLE}),
-    ]:
-        missing = columns - set(frame.columns)
-        if missing:
-            raise ValueError(f"Colunas necessárias ausentes: {sorted(missing)}")
-    monthly = monthly.loc[(monthly["borough_flag"] == 1) & (monthly["date"].dt.month == 12),
-                          ["area", "date", TARGET]].copy()
-    yearly = yearly.loc[yearly["borough_flag"] == 1, ["area", "date", *MULTIPLE]].copy()
-    for label, frame in [("mensal", monthly), ("anual", yearly)]:
-        if frame.duplicated(["area", "date"]).any():
-            raise ValueError(f"Chaves duplicadas na tabela {label}")
-    data = yearly.merge(monthly, on=["area", "date"], validate="one_to_one", how="inner")
-    for feature in (*MULTIPLE, TARGET):
-        data[feature] = pd.to_numeric(data[feature], errors="coerce")
-    if data[TARGET].isna().any() or (data[TARGET] <= 0).any():
-        raise ValueError("Alvo ausente ou não positivo; revisar fonte antes de prosseguir")
-    data["year"] = data["date"].dt.year.astype(int)
-    data = data[["area", "date", "year", TARGET, *MULTIPLE]].sort_values(["area", "date"]).reset_index(drop=True)
-    if data.empty or data["area"].isna().any() or data[["area", "date"]].duplicated().any():
-        raise ValueError("Dataset vazio, área ausente ou registros duplicados")
-    return data
-
-
-def temporal_split(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """Holdouts cronológicos com anos exclusivos e sem embaralhamento."""
-    train = data.loc[data["year"] <= TRAIN_LAST_YEAR].copy()
-    val = data.loc[data["year"].between(TRAIN_LAST_YEAR + 1, VAL_LAST_YEAR)].copy()
-    test = data.loc[data["year"].between(VAL_LAST_YEAR + 1, TEST_LAST_YEAR)].copy()
-    if any(part.empty for part in (train, val, test)):
-        raise ValueError("Não há observações suficientes nos três períodos temporais")
-    if data["year"].max() > TEST_LAST_YEAR:
-        raise ValueError("Novos anos na fonte: reveja e versiona o protocolo antes de continuar")
-    if not (train["date"].max() < val["date"].min() < test["date"].min()):
-        raise AssertionError("Vazamento temporal entre treino, validação e teste")
-    if sum(len(x) for x in (train, val, test)) != len(data):
-        raise ValueError("Há anos fora do protocolo temporal definido")
-    return train, val, test
-
-
-@dataclass(frozen=True)
-class ModelSpec:
-    name: str
-    features: tuple[str, ...]
-    algorithm: str
-    parameter: float | int | None = None
-
-    def build(self):
-        if self.algorithm == "baseline":
-            return DummyRegressor(strategy="mean")
-        if self.algorithm == "forest":
-            return Pipeline([
-                ("imputer", SimpleImputer(strategy="median")),
-                ("model", RandomForestRegressor(
-                    n_estimators=200, min_samples_leaf=int(self.parameter),
-                    random_state=RANDOM_SEED, n_jobs=1,
-                )),
-            ])
-        if self.algorithm in ("linear", "ridge"):
-            regressor = LinearRegression() if self.algorithm == "linear" else Ridge(alpha=float(self.parameter))
-            return Pipeline([
-                ("imputer", SimpleImputer(strategy="median")),
-                ("scaler", StandardScaler()),
-                ("model", regressor),
-            ])
-        raise ValueError(f"Algoritmo desconhecido: {self.algorithm}")
-
-    def description(self) -> str:
-        return f"{self.algorithm}; parâmetro={self.parameter}" if self.parameter is not None else self.algorithm
-
-
-def candidates() -> dict[str, list[ModelSpec]]:
-    return {
-        "Baseline": [ModelSpec("Baseline", SIMPLE, "baseline")],
-        "Linear simples": [ModelSpec("Linear simples", SIMPLE, "linear")],
-        "Linear múltipla": [ModelSpec("Linear múltipla", MULTIPLE, "linear")],
-        "Ridge": [ModelSpec("Ridge", MULTIPLE, "ridge", a) for a in (0.1, 1.0, 10.0, 100.0, 1000.0)],
-        "Random Forest": [ModelSpec("Random Forest", MULTIPLE, "forest", leaf) for leaf in (2, 5, 10)],
-    }
+# Reexports explícitos: contratos anteriores usados em notebooks e testes.
+__all__ = [
+    "TARGET", "SIMPLE", "MULTIPLE", "RANDOM_SEED",
+    "TRAIN_LAST_YEAR", "VAL_LAST_YEAR", "TEST_LAST_YEAR",
+    "load_housing_data", "temporal_split", "ModelSpec", "candidates",
+    "metric_values", "choose_from_validation", "evaluate_final", "grouped_cv",
+    "bootstrap_by_district", "error_diagnostics", "file_sha256",
+    "write_markdown_report",
+]
 
 
 def metric_values(y_true, predicted) -> dict[str, float]:
