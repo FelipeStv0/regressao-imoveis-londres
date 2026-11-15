@@ -1,5 +1,8 @@
 # Housing in London | Benchmark de Machine Learning
 
+**Idiomas:** [Português](README.md) | [English](README_EN.md)
+
+
 [![Reprodutibilidade e benchmark de ML](https://github.com/FelipeStv0/regressao-imoveis-londres/actions/workflows/reproducibility.yml/badge.svg)](https://github.com/FelipeStv0/regressao-imoveis-londres/actions/workflows/reproducibility.yml)
 
 Projeto de **portfólio em Ciência de Dados e Machine Learning**: regressão sobre preços médios históricos de distritos de Londres, com pipelines, testes, separações de treino/validação/teste, diagnósticos, análise de erros e execução reproduzível.
